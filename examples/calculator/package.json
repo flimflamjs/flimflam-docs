@@ -1,12 +1,11 @@
 {
-  "name": "todo",
-  "version": "0.0.1",
+  "name": "counter",
+  "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.es6",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify -t babelify index.es6 > bundle.js",
-    "watch": "watchify -v -t babelify index.es6 -o bundle.js"
+    "build": "browserify -t babelify index.es6 > bundle.js"
   },
   "author": "jay r bolton <jayrbolton@gmail.com> (http://jayrbolton.com/)",
   "license": "ISC",
@@ -15,9 +14,7 @@
   },
   "dependencies": {
     "flyd": "^0.2.1",
-    "flimflam-render": "0.0.3",
     "immutable": "^3.7.6",
-    "snabbdom": "^0.3.0",
-    "uuid": "2.0.1"
+    "snabbdom": "^0.3.0"
   }
 }

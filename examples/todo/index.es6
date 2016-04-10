@@ -8,7 +8,7 @@
 
 import h from 'snabbdom/h'
 import flyd from 'flyd'
-import flyd_flam from '../../../flyd-construct/index.js'
+import render from '../../../flimflam-render'
 
 import taskList from './lib/task-list.es6'
 import newTaskForm from './lib/new-task-form.es6'
@@ -25,7 +25,7 @@ function view(state) {
   return h('div', [ taskList.view(state.children.taskList) ])
 }
 
-let vtree$ = flyd_flam(
+let {vtree$, state$} = render(
   init()
 , view
 , container

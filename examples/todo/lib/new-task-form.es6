@@ -26,9 +26,9 @@ function getNewTask(submit$) {
 }
 
 
-function view(state) {
+function view(component) {
   return h('form', {
-    on: {submit: state.streams.submit}
+    on: {submit: component.streams.submit}
   }, [
     h('input', {props: {type: 'text', name: 'name', placeholder: 'New Task'}})
   ])

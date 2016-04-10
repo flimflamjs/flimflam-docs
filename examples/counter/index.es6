@@ -1,28 +1,25 @@
 import flyd from 'flyd'
 import h from 'snabbdom/h'
-import R from '../../../flyd-construct/node_modules/ramda'
+import R from 'ramda'
 
-flyd.flam = require('../../../flyd-construct/index.es6')
+import render from '../../../flimflam-render'
 
+function init() {
+  return {
+    streams: { add: flyd.stream() }
+  , updates: { add: (n, state) => R.assoc('count', n + state.count, state) }
+  , state:    { count: 0 }
+  }
+}
 
-const init = ()=> ({
-  streams: { add: flyd.stream() }
-, updates: { add: (n, state) => R.evolve({count: R.add(n)}, state) }
-, data:    { count: 0 }
-})
-
-// Our counter view (all the markup with event handler streams)
-const view = state => 
-  h('div', [
-    h('p', `Total count: ${state.data.count}`)
-  , h('button', {on: {click: [state.streams.add,  1]}}, 'Increment!')
-  , h('button', {on: {click: [state.streams.add, -1]}}, 'Decrement!')
-  , h('button', {on: {click: [state.streams.add, -state.data.count]}}, 'Reset!')
+function view(component) {
+  return h('body', [
+    h('p', `Total count: ${component.state.count}`)
+  , h('button', {}, 'Increment!')
+  , h('button', {}, 'Decrement!')
+  , h('button', {}, 'Reset!')
   ])
+}
 
-
-// Plain HTML container node
-let container = document.querySelector('#container')
-
-let vtree$ = flyd.flam(init(), view, container, {debug: true})
+let vtree$ = render({}, view, document.body, {debug: true})
 
