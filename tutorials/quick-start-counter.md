@@ -21,7 +21,7 @@ Add a test log in index.es6:
 console.log('hallo world')
 ```
 
-Compile ES6 to ES5 with browserify / babelify. You can also use tools like [Budo](https://github.com/mattdesl/budo), [watchify](https://github.com/substack/watchify), and [gulp](http://gulpjs.com/). I like budo the most.
+Compile ES6 to ES5 with browserify / babelify. I also highly recommend [Budo](https://github.com/mattdesl/budo). Other useful build tools are [watchify](https://github.com/substack/watchify) and [gulp](http://gulpjs.com/).
 
 ```
 browserify -t babelify index.es6 > index.js
@@ -36,8 +36,7 @@ Include your compiled `index.js` file in `index.html` (not needed if using budo)
 </body>
 ```
 
-Open your browser and make sure the test command shows up in your console. If so, you have completed the basic build process. You will need to use browserify/babel every time you make an update to verify your results in the browser (or use Budo to speed things up).
-
+Open your browser and make sure the test command shows up in your console. If so, you have completed the basic build process. You will need to use browserify/babel every time you make an update to verify your results in the browser (or use Budo with LiveReload).
 
 ## The view
 
@@ -130,7 +129,7 @@ The final step to get things working is to now make use of our `add` stream in t
 ```js
 // Our counter view (all the markup with event handler streams)
 function view(component) {
-  return h('body.counter', [
+  return h('div', [
     h('p', `The total count is ${component.state.count}`)
   , h('button', {on: {click: [component.streams.add,  1]}}, 'Increment!')
   , h('button', {on: {click: [component.streams.add, -1]}}, 'Decrement!')

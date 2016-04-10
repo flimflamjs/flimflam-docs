@@ -13,11 +13,11 @@ function init() {
 }
 
 function view(component) {
-  return h('body', [
-    h('p', `Total count: ${component.state.count}`)
-  , h('button', {}, 'Increment!')
-  , h('button', {}, 'Decrement!')
-  , h('button', {}, 'Reset!')
+  return h('div', [
+    h('p', `The total count is ${component.state.count}`)
+  , h('button', {on: {click: [component.streams.add,  1]}}, 'Increment!')
+  , h('button', {on: {click: [component.streams.add, -1]}}, 'Decrement!')
+  , h('button', {on: {click: [component.streams.add, -component.state.count]}}, 'Reset!')
   ])
 }
 
