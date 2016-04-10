@@ -4,7 +4,7 @@ To get a quick idea how the flimflam pattern works, we will build a simple count
 
 It will cover the basics of creating views, streams, and updates.
 
-We will use Ramda, Flyd, and Snabbdom for this component.
+We will use [Ramda](https://ramdajs.com/0.19.1/docs/), [Flyd](https://github.com/paldepind/flyd), and [Snabbdom](https://github.com/paldepind/snabbdom) for this component.
 
 Get your npm package initialized and dependencies installed:
 
