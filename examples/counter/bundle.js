@@ -30,10 +30,10 @@ function init() {
 }
 
 function view(component) {
-  return (0, _snabbdomH2['default'])('body', [(0, _snabbdomH2['default'])('p', 'Total count: ' + component.state.count), (0, _snabbdomH2['default'])('button', {}, 'Increment!'), (0, _snabbdomH2['default'])('button', {}, 'Decrement!'), (0, _snabbdomH2['default'])('button', {}, 'Reset!')]);
+  return (0, _snabbdomH2['default'])('div', [(0, _snabbdomH2['default'])('p', 'The total count is ' + component.state.count), (0, _snabbdomH2['default'])('button', { on: { click: [component.streams.add, 1] } }, 'Increment!'), (0, _snabbdomH2['default'])('button', { on: { click: [component.streams.add, -1] } }, 'Decrement!'), (0, _snabbdomH2['default'])('button', { on: { click: [component.streams.add, -component.state.count] } }, 'Reset!')]);
 }
 
-var vtree$ = (0, _flimflamRender2['default'])({}, view, document.body, { debug: true });
+var vtree$ = (0, _flimflamRender2['default'])(init(), view, document.body, { debug: true });
 
 },{"../../../flimflam-render":12,"flyd":2,"ramda":3,"snabbdom/h":9}],2:[function(require,module,exports){
 var curryN = require('ramda/src/curryN');

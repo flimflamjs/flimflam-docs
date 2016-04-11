@@ -8,7 +8,7 @@ function init() {
   return {
     streams: { add: flyd.stream() }
   , updates: { add: (n, state) => R.assoc('count', n + state.count, state) }
-  , state:    { count: 0 }
+  , state:   { count: 0 }
   }
 }
 
@@ -21,5 +21,5 @@ function view(component) {
   ])
 }
 
-let vtree$ = render({}, view, document.body, {debug: true})
+let vtree$ = render(init(), view, document.body, {debug: true})
 
