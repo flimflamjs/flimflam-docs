@@ -1,7 +1,7 @@
 
 # flimflam specification
 
-Flimflam is mostly a specification about "UI components", rather than other types of modules:
+Flimflam is mostly a specification about "UI components":
 
 - A **UI component** is a javascript module that is meant to be rendered into the browser/app and represents a part of a User Interface.
 - Non-UI components are considered utility packages, and handle things like date formatting, ajax, currency calculations, etc, etc
@@ -10,7 +10,7 @@ Every **UI component** should use:
 
 - ramda for all functional operations, like map, reduce, compose, etc
 - ramda functions for all state changes -- no state mutations 
-- snabbdom for defining HTML and SVG trees
+- snabbdom for generating HTML and SVG trees
 - flyd for handling all asynchronous data (user events, ajax, etc)
 
 There are no hard specifications on non-UI components, but in general it is preferable if they use ramda and flyd.
@@ -19,7 +19,7 @@ It is recommended but not required to use ES6. Coffeescript is generally discour
 
 Other recommendations:
 - Provide GIF and linked demos for each component
-- Provide full test coverage
+- Full test coverage
 
 ## UI components
 
@@ -41,9 +41,9 @@ An object of `{streams, updates, state, children}` is called a **context**. Cont
 - state: a plain js object of any data
 - children: an object of key/vals where the keys are child component names and the values are child **context** objects
 
-- A view function for a dynamic UI component takes a **context** as its first parameter (and any other parameters) and returns a snabbdom VTree
+- A view function for a dynamic UI component takes a **context** as its first parameter (plus any other parameters) and returns a snabbdom VTree
 
-Within your view functions, You can use your `context.state` to access the most recent state data, and you can use `context.streams` to use snabbdom eventlisteners to push events or other data to your streams.
+Within your view functions, You can use your `context.state` to access the most recent state data, and you can use `context.streams` to use snabbdom eventlisteners to push events or other data to your streams. "`ctx`" is a standard way of shortening the variable name.
 
 The **.updates** object inside a **context** is a set of updater functions. The keys in this object map to the keys in your **.streams** object. For example:
 
@@ -56,6 +56,7 @@ let updates = {
 }
 ```
 
-This specifies that for every value on the stream called `s1`, we want take the value and the current state, and associate the value to a key called `'key'` within the state. **The return value of an updater function is the newly updated state**.
+This specifies a single stream, `s1`, that is initially empty, but may have any number of values pushed later. A corresponding updater, also called `s1`, defines how the state gets updated based on values from the `s1` stream. For every value on the stream called `s1`, we take the value and the current state, and associate the value to a key called `'key'` within the state. **The return value of an updater function is the newly updated state and is always a brand new state object**.
 
-You can use [flimflam-render](https://github.com/jayrbolton/flimflam-render) to render your very top-level component to the page.
+You can use [flimflam-render](https://github.com/jayrbolton/flimflam-render) to render your very top-level component to the page. Using flimflam-render is only necessary in your actual app. In a "one-page" app, render is only called a single time.
+
