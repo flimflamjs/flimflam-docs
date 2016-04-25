@@ -21,14 +21,9 @@ function init() {
 }
 
 
-function view(state) {
-  return h('div', [ taskList.view(state.children.taskList) ])
+function view(component) {
+  return h('div', [ taskList.view(component.children.taskList) ])
 }
 
-let {vtree$, state$} = render(
-  init()
-, view
-, container
-, {debug: true}
-)
+let {vtree$, state$} = render(init(), view, container, {debug: true})
 
