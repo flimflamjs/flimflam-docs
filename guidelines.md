@@ -1,3 +1,8 @@
+
+Go to [/directory-json](http://github.com/flimflamjs/directory-json) and make a PR on `registry.json` !!!
+
+General guidelines that we don't actually enforce very strictly, but are good goals:
+
 Do:
 - Have full test coverage
 - Have a live demo page for the component (and an animated GIF -- try using byzanz)
