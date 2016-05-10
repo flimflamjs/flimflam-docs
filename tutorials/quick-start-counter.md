@@ -44,14 +44,14 @@ It's often easiest to start by sketching out your view and seeing it render to t
 
 The `h` function from snabbdom is used to create a virtual tree of DOM nodes that can be rendered to the page dynamically.
 
-By convention, we call our main view function `view`, with the first argument being the component object (more on that soon).
+By convention, we call our main view function `view`, with the first argument being the context object (more on that soon).
 
 ** index.es6 **
 
 ```js
 import h from 'snabbdom/h'
 
-function view(component) {
+function view(ctx) {
   return h('div', [
     h('p', 'The count is x')
   , h('button', 'Increment!')
@@ -80,27 +80,27 @@ let container = document.querySelector("#container")
 render({}, view, container)
 ```
 
-You can see we've left the first argument (the component object), empty for now. The component object will control UI state and functionality.
+You can see we've left the first argument (the context object), empty for now. The context object will control UI state and functionality.
 
 Run your build command and open up index.html in your browser to test that everything looks okay.
 
 Now you have the basics of rendering markup to the page!
 
-View functions are normal functions that take a component as the first parameter (and any other parameters you want) and return a Snabbdom Virtual DOM Tree using the `h` function. You can use many functions to split up your page, passing the component along the way, with any other arguments you need.
+View functions are normal functions that take a context as the first parameter (and any other parameters you want) and return a Snabbdom Virtual DOM Tree using the `h` function. You can use many functions to split up your page, passing the context along the way, with any other arguments you need.
 
 
 ## Functionality
 
-To get things working, we can create a ** component **. Flimflam components are plain javascript objects with a certain set of keys:
+To get things working, we can create a *context constructor function*. Flimflam contexts are plain javascript objects with a certain set of keys:
 
 - `.streams` - flyd streams that are used for click events, form submits, ajax responses, etc.
 - `.state` - data for the component to use in its view(s), which represents the current state of the UI
-- `.updates` - an object of stream names and functions that update the component's state
-- `.children` - nested child components
+- `.updates` - an object of stream names and functions that update the state
+- `.children` - nested child context objects
 
-Components are initialized using an `init` function, which can be thought of as the initializer/constructor for the component.
+Contexts are initialized using an `init` function, which can be thought of as the constructor function for the context.
 
-The init function returns the component object. For a simple counter, we can do:
+The init function returns the context object. For a simple counter, we can do:
 
 ```js
 function init() {
@@ -128,23 +128,23 @@ The final step to get things working is to now make use of our `add` stream in t
 
 ```js
 // Our counter view (all the markup with event handler streams)
-function view(component) {
+function view(ctx) {
   return h('div', [
-    h('p', `The total count is ${component.state.count}`)
-  , h('button', {on: {click: [component.streams.add,  1]}}, 'Increment!')
-  , h('button', {on: {click: [component.streams.add, -1]}}, 'Decrement!')
-  , h('button', {on: {click: [component.streams.add, -component.state.count]}}, 'Reset!')
+    h('p', `The total count is ${ctx.state.count}`)
+  , h('button', {on: {click: [ctx.streams.add,  1]}}, 'Increment!')
+  , h('button', {on: {click: [ctx.streams.add, -1]}}, 'Decrement!')
+  , h('button', {on: {click: [ctx.streams.add, -ctx.state.count]}}, 'Reset!')
   ])
 }
 ```
 
-We've updated our buttons to make use of the `add` stream from `component.streams`. We can use the `add` stream for the reset button as well by using the negative count, which will make the count zero when added. We use some ES6 interpolation (with backticks instead of quotes), and print `component.state.count`, which will always print the most recent value for `state.count`.
+We've updated our buttons to make use of the `add` stream from `ctx.streams`. We can use the `add` stream for the reset button as well by using the negative count, which will make the count zero when added. We use some ES6 interpolation (with backticks instead of quotes), and print `ctx.state.count`, which will always print the most recent value for `state.count`.
  
 Now rebuild `index.es6` and test it!
 
-## Component/View Template
+## Context/View Template
 
-Here is a handy blank template for making component/view files. 
+Here is a handy blank template for making context/view files. 
 
 ```js
 import R from 'ramda'
@@ -159,12 +159,12 @@ function init(yourParameters...) {
   return {children, state, streams, updates}
 }
 
-function view(component) {
+function view(ctx) {
   returh('h.your-markdown-here')
 }
 ```
 
-And here is a template for importing and rendering a parent component to the page.
+And here is a template for importing and rendering a parent context to the page.
 
 ```js
 import component from './my-component'
