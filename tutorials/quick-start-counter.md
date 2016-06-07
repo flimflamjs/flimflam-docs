@@ -115,15 +115,15 @@ Use an initialization function (call it `init`) to construct the state object.
 
 ```js
 function init() {
-  let add = flyd.stream()
-  let sum = flyd.scan(R.add, 0, add)
+  const add = flyd.stream()
+  const sum = flyd.scan(R.add, 0, add)
   return {add, sum}
 }
 ```
 
-We are initializing a state object that has two flyd streams inside it: `add` and `sum`. The sum stream will hold the total counter value, and it will change over time. Likewise, the add stream will hold the latest value that the user wanted to add to the sum stream. This will get set every time the user clicks a button.
+We are initializing a state object that has two flyd streams inside it: `add` and `sum`. The add stream will hold values that the user wants to add to the counter (these values will be emitted from an event listener on a button). The sum stream adds up all the `add` stream values to create a stream of sum values.
 
-The `sum` stream uses the flyd [scan](https://github.com/paldepind/flyd) function. It is similar to the reduce function, but returns a stream of accumulated values instead of a single value. It starts with an initial seed value, `0`, and adds each successive value from the `add` stream to get a rolling sum.
+The `sum` stream uses the flyd [scan](https://github.com/paldepind/flyd) function. It is similar to the reduce function from functional programming, but returns a stream of accumulated values instead of a single value. It starts with an initial seed value, `0`, and adds each successive value from the `add` stream to get a rolling sum.
 
 You can see how ramda (above imported as `R`) is very handy for functional programming -- we can pass the ramda addition function as the first argument to calculate the sum. This scan function could be written without ramda like this: `flyd.scan((acc, n) => acc + n, 0, add)`.
 
@@ -133,7 +133,7 @@ The final step to get things working is to now make use of our newly created `ad
 
 ```js
 // Our counter view (all the markup with event handler streams)
-function view(component) {
+function view(ctx) {
   return h('div', [
     h('p', `The total count is ${state.sum()}`)
   , h('button', {on: {click: [state.add,  1]}}, 'Increment!')
@@ -143,48 +143,11 @@ function view(component) {
 }
 ```
 
-You can see that we need to call the streams to get their current value: `state.sum()`.
+We need to call the streams to get their current value like: `state.sum()`.
 
 We can bind streams in our state to eventlisteners by simply passing the streams to the snabbdom click handler.
 
 In the snippet `{on: {click: [state.add, 1]}}`, we are saying that every time someone clicks on this button we want to emit the value `1` on the `add` stream. In snabbdom, when you pass a pair of `[function, value]`, snabbdom will call that function with that value every time the event occurs.
 
 Now rebuild `index.es6` and test it!
-
-## Component/View Template
-
-Here is a handy blank template for making component/view files. 
-
-```js
-import R from 'ramda'
-import flyd from 'flyd'
-import h from 'snabbdom/h'
-
-function init(yourParameters...) {
-  let children = { }
-  let state = { }
-  let streams = { }
-  let updates = { }
-  return {children, state, streams, updates}
-}
-
-function view(component) {
-  returh('h.your-markdown-here')
-}
-```
-
-And here is a template for importing and rendering a parent component to the page.
-
-```js
-import component from './my-component'
-import render from 'flimflam-render'
-
-let container = document.querySelector('#my-container')
-render(component.init(), component.view, container)
-```
-
-#### resources
-
-- [counter code](/examples/counter/index.es6)
-- [todo example](/examples/todo/index.es6)
 
