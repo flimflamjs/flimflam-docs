@@ -1,98 +1,76 @@
 import flyd from 'flyd'
 import h from 'snabbdom/h'
 import R from 'ramda'
+import scanMerge from 'flyd/module/scanmerge'
+import snabbdom from 'snabbdom'
 
-import render from '../../../flimflam-render'
+import render from 'flimflam-render'
 
 // This calculator component tracks:
 //   expr: an array of numbers and operators pushed in the expression
 function init() {
-  let streams = {
-    changeInput: flyd.stream()
-  , clickNumButton: flyd.stream()
-  , clickOpButton: flyd.stream()
-  , clickEquals: flyd.stream()
-  }
-  streams.currentNum = flyd.map(ev => ev.currentTarget.value, streams.changeInput)
-  let updates = {
-    currentNum: R.assoc('digit')
-  , clickNumButton: (d, state) => R.assoc('digit', R.append(d, state.digit), state)
-  , clickOpButton: appendIf
-  , clickEquals: calculate
-  }
-  let data = { expr: [] }
-  return { streams, updates, data }
+  let input = flyd.stream() // input keyups
+  let digit = flyd.stream() // button presses
+  let op = flyd.stream() // button presses
+  let clear = flyd.stream() // clear out expression
+
+  // Single stream of current expression
+  let expr = scanMerge([
+    [input, (expr, i) => i] // changing input simply sets the expr
+  , [digit,   (expr, ch) => expr + ch] // pressing a button simply appends that to the expr
+  , [op, applyOp]
+  , [clear,    (expr, _) => '']
+  ], '')
+
+  return {input, digit, op, clear, expr}
 }
 
-// Behavior:
-//   clicks digit
-//      last is op    -> append new num
-//      last is digit -> append to existing num
-//   clicks operator
-//      last is num -> push op
-//      last is op  -> replace op
-//   clicks negative
-//      last is op  -> push negative
-//      last is num -> push subtract
-//   clicks equal
-//      last is num -> evaluate expr
-//
-//  keyup on digits/ops has same behavior as clicks on corresponding buttons
-//
-//  buttons are greyed out when they will not make a valid expr
+const applyOp = (expr, op) => {
+  const digits = R.map(Number, expr.split(/[ _]/))
+  if(digits.length > 1) {
+    return ops[op](digits)
+  } else {
+    return expr
+  }
+}
 
-// Display name : function
 let ops = {
-  '+' : R.add
-, '*' : R.multiply
-, '/' : R.divide
-, '-' : R.subtract
+  '+' : R.sum
+, '*' : R.reduce(R.multiply, 1)
+, '/' : ns => R.reduce(R.divide, R.head(ns), R.tail(ns))
+, '-' : ns => R.reduce(R.subtract, R.head(ns), R.tail(ns))
 }
 
-// When the user presses the equals button,
-// then evaluate the expression array
-// and set the result to the display and clear the expr array
-function calculate(_, state) {
-  let result = R.reduce(
-    (acc, x) => typeof x === 'function'
-      ? [R.apply(x, acc)]
-      : R.append(x, acc)
-  , []
-  , state.expr)[0]
-
-  return R.merge(state, {
-    digit: String(result)
-  , expr: []
-  })
-}
-
-
-// When a user presses an operator button,
-// push the currently displayed digit and the operator to the expression array
-// and clear the display
-function pushToExpr(op, state) {
-  let expr = R.compose(
-    R.append(Number(state.digit))
-  , R.append(op)
-  )(state.expr)
-
-  return R.merge(state, { expr, digit: '' })
-}
 
 
 // Our counter view (all the markup with event handler streams)
-function view(component) {
-  h('div', [
-    h('p', `Total count: ${state.data.count}`)
-  , h('button', {on: {click: [state.streams.add,  1]}}, 'Increment!')
-  , h('button', {on: {click: [state.streams.add, -1]}}, 'Decrement!')
-  , h('button', {on: {click: [state.streams.add, -state.data.count]}}, 'Reset!')
+function view(state) {
+  return h('div', [
+    h('h1', 'postfix calculator!')
+  , h('p', 'Enter numbers first and operators last; separate numbers by spaces')
+  , h('input', {
+      on: {keyup: ev => state.input(ev.currentTarget.value)}
+    , props: {
+        name: 'expr'
+      , placeholder: 'Calculate party'
+      , value: state.expr()
+      }
+    })
+  , h('div', [
+      h('button', {on: {click: state.clear}}, 'clear')
+    , h('button', {on: {click: [state.digit, '_']}, props: {innerHTML: '_'}})
+    ])
+  , h('div', R.map(btn(state.digit), [1,2,3,4,5,6,7,8,9,0]))
+  , h('div', R.map(btn(state.op), ['+','-','*','/']))
   ])
 }
 
+const btn = stream => n => h('button', {on: {click: [stream, n]}}, String(n))
 
 // Plain HTML container node
 let container = document.querySelector('#container')
+const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props')])
+let state = init()
 
-let vtree$ = flyd.flam(init(), view, container, {debug: true})
+render({view, patch, container, state})
 

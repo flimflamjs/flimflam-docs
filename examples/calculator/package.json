@@ -5,7 +5,8 @@
   "main": "index.es6",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify -t babelify index.es6 > bundle.js"
+    "build": "browserify -t babelify index.es6 > bundle.js",
+    "watch": "watchify -v -t babelify index.es6 -o bundle.js"
   },
   "author": "jay r bolton <jayrbolton@gmail.com> (http://jayrbolton.com/)",
   "license": "ISC",
@@ -13,8 +14,9 @@
     "babelify": "6.4.0"
   },
   "dependencies": {
-    "flyd": "^0.2.1",
-    "immutable": "^3.7.6",
-    "snabbdom": "^0.3.0"
+    "flimflam-render": "0.1.2",
+    "flyd": "0.2.2",
+    "ramda": "0.21.0",
+    "snabbdom": "0.5.0"
   }
 }
