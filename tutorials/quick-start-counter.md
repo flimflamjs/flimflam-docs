@@ -4,13 +4,15 @@ To get a quick idea how the flimflam pattern works, we will build a simple count
 
 It will cover the basics of creating views, streams, and updates.
 
-We will use [Ramda](https://ramdajs.com/0.19.1/docs/), [Flyd](https://github.com/paldepind/flyd), and [Snabbdom](https://github.com/paldepind/snabbdom) for this component.
+We will use [Ramda](https://ramdajs.com/0.19.1/docs/), [Flyd](https://github.com/paldepind/flyd), and [Snabbdom](https://github.com/paldepind/snabbdom) for this state.
+
+Get a basic familiarity with flyd streams and functional reactive programming by reading the flyd documentation above.
 
 Get your npm package initialized and dependencies installed:
 
 ```sh
 npm init
-npm install --save ramda flyd snabbdom
+npm install --save --save-exact ramda flyd snabbdom
 ```
 
 All the example code in this tutorial can go in a single index file. 
@@ -27,7 +29,7 @@ Compile ES6 to ES5 with browserify / babelify. I also highly recommend [Budo](ht
 browserify -t babelify index.es6 > index.js
 ```
 
-Include your compiled `index.js` file in `index.html` (not needed if using budo)
+Include your compiled `index.js` file in `index.html` (not needed if using budo):
 
 ```html
 <body>
@@ -44,14 +46,14 @@ It's often easiest to start by sketching out your view and seeing it render to t
 
 The `h` function from snabbdom is used to create a virtual tree of DOM nodes that can be rendered to the page dynamically.
 
-By convention, we call our main view function `view`, with the first argument being the component object (more on that soon).
+By convention, we call our main view function `view`, with the first argument being the state object (more on that soon).
 
 ** index.es6 **
 
 ```js
 import h from 'snabbdom/h'
 
-function view(component) {
+function view(state) {
   return h('div', [
     h('p', 'The count is x')
   , h('button', 'Increment!')
@@ -72,74 +74,81 @@ This Virtual DOM is the same as writing the following HTML (except for the dynam
 </div>
 ```
 
-To render our view to the page, we use the `flimflam-render` (run `npm install --save flimflam-render`)
+To render our VTree to the page, we make use of snabbdom's patch function, which is modular. For this component, we only need the eventlisteners module:
+
+```js
+import snabbdom from 'snabbdom/patch'
+const patch = snabbdom.init([ require('snabbdom/modules/eventlisteners') ])
+```
+
+
+To actually perform the rendering, we can use the `flimflam-render` (run `npm install --save --save-exact flimflam-render`)
 
 ```js
 import render from 'flydflam-render'
-let container = document.querySelector("#container")
-render({}, view, container)
+render({
+  view: view
+, container: document.querySelector("#container")
+, patch: patch
+, state: {}
+})
 ```
 
-You can see we've left the first argument (the component object), empty for now. The component object will control UI state and functionality.
+You can see we've left the state object blank for now. We will add the functionality into there next.
+
+This render function will handle some of the behind-the-scenes functionality
+that ensures that your view function will get re-rendered to the page every
+time you update some data in your state.
 
 Run your build command and open up index.html in your browser to test that everything looks okay.
 
 Now you have the basics of rendering markup to the page!
 
-View functions are normal functions that take a component as the first parameter (and any other parameters you want) and return a Snabbdom Virtual DOM Tree using the `h` function. You can use many functions to split up your page, passing the component along the way, with any other arguments you need.
+View functions are normal functions that take a state object as the first parameter (and any other parameters you want) and return a Snabbdom Virtual DOM Tree using the `h` function. You can use many functions to split up your page, passing the state data along the way, with any other arguments you need.
 
 
 ## Functionality
 
-To get things working, we can create a ** component **. Flimflam components are plain javascript objects with a certain set of keys:
+To get things actually working, we can create a **state object**. Flimflam states are simple javascript objects that hold plain JS values and flyd streams.
 
-- `.streams` - flyd streams that are used for click events, form submits, ajax responses, etc.
-- `.state` - data for the component to use in its view(s), which represents the current state of the UI
-- `.updates` - an object of stream names and functions that update the component's state
-- `.children` - nested child components
-
-Components are initialized using an `init` function, which can be thought of as the initializer/constructor for the component.
-
-The init function returns the component object. For a simple counter, we can do:
+Use an initialization function (call it `init`) to construct the state object. 
 
 ```js
 function init() {
-  return {
-    streams: { add: flyd.stream() }
-  , updates: { add: (n, state) => R.assoc('count', n + state.count), state) }
-  , state:   { count: 0 }
-  }
+  let add = flyd.stream()
+  let sum = flyd.scan(R.add, 0, add)
+  return {add, sum}
 }
 ```
 
-We return a `.streams` object, having a key `.add`, which we set to an empty flyd stream. This will be a stream of integers that get summed into a total.
+We are initializing a state object that has two flyd streams inside it: `add` and `sum`. The sum stream will hold the total counter value, and it will change over time. Likewise, the add stream will hold the latest value that the user wanted to add to the sum stream. This will get set every time the user clicks a button.
 
-`.updates` also has a key called `.add`, which means it uses the `add` stream from the `.streams` object. The `add` updater function takes a number (`n`) and the current state (`state`) and returns a new state. This `updates` object can be thought of as: "for every value on the `add` stream, apply this function to the value and to the current state. The return value of the function will be the new state."
+The `sum` stream uses the flyd [scan](https://github.com/paldepind/flyd) function. It is similar to the reduce function, but returns a stream of accumulated values instead of a single value. It starts with an initial seed value, `0`, and adds each successive value from the `add` stream to get a rolling sum.
 
-All updater functions have this same format. Their first parameter is the current value from the stream. The second parameter is the current state. And they return a new, modified state. Every time one of your updater functions updates the state, the DOM will automatically update as well.
-
-We use ramda functions to update the state immutably. In this case, we simply add `n` to the existing `count` key in the state. We always avoid mutation in the state object by using such ramda functions as `assoc`, `assocPath`, `merge`, `evolve`, `prepend`, `append`, and many others.
-
-Your `init` function can take any parameters you want. Think of this as the API for the component. Often, for more complex components, you want to pass in default state data and other streams.
+You can see how ramda (above imported as `R`) is very handy for functional programming -- we can pass the ramda addition function as the first argument to calculate the sum. This scan function could be written without ramda like this: `flyd.scan((acc, n) => acc + n, 0, add)`.
 
 ## View function, revised
 
-The final step to get things working is to now make use of our `add` stream in the view, as well as printing the `count` value.
+The final step to get things working is to now make use of our newly created `add` and `sum` streams in the view:
 
 ```js
 // Our counter view (all the markup with event handler streams)
 function view(component) {
   return h('div', [
-    h('p', `The total count is ${component.state.count}`)
-  , h('button', {on: {click: [component.streams.add,  1]}}, 'Increment!')
-  , h('button', {on: {click: [component.streams.add, -1]}}, 'Decrement!')
-  , h('button', {on: {click: [component.streams.add, -component.state.count]}}, 'Reset!')
+    h('p', `The total count is ${state.sum()}`)
+  , h('button', {on: {click: [state.add,  1]}}, 'Increment!')
+  , h('button', {on: {click: [state.add, -1]}}, 'Decrement!')
+  , h('button', {on: {click: [state.add, -state.sum()]}}, 'Reset!')
   ])
 }
 ```
 
-We've updated our buttons to make use of the `add` stream from `component.streams`. We can use the `add` stream for the reset button as well by using the negative count, which will make the count zero when added. We use some ES6 interpolation (with backticks instead of quotes), and print `component.state.count`, which will always print the most recent value for `state.count`.
- 
+You can see that we need to call the streams to get their current value: `state.sum()`.
+
+We can bind streams in our state to eventlisteners by simply passing the streams to the snabbdom click handler.
+
+In the snippet `{on: {click: [state.add, 1]}}`, we are saying that every time someone clicks on this button we want to emit the value `1` on the `add` stream. In snabbdom, when you pass a pair of `[function, value]`, snabbdom will call that function with that value every time the event occurs.
+
 Now rebuild `index.es6` and test it!
 
 ## Component/View Template

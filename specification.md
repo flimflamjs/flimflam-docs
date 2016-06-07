@@ -13,13 +13,13 @@ Every **UI component** should use:
 - snabbdom for generating HTML and SVG trees
 - flyd for handling all asynchronous data (user events, ajax, etc)
 
-There are no hard specifications on non-UI components, but in general it is preferable if they use ramda and flyd.
+There are no hard specifications on non-UI components, but in general it is preferable if they use ramda and flyd and have a functional, non-mutating style.
 
 It is recommended but not required to use ES6. Coffeescript is generally discouraged to avoid obscuring the semantics of javascript.
 
 Other recommendations:
 - Provide GIF and linked demos for each component
-- Full test coverage
+- Provide full test coverage
 
 ## UI components
 
@@ -28,35 +28,15 @@ Other recommendations:
 
 A static component must export any number of view functions.
 
-- A **view function** is a regular javascript function that takes some data and returns a snabbdom VTree.
+- A **view function** is a regular javascript function that takes some data and returns a snabbdom VTree (which can be used to produce HTML).
 
 A dynamic component must export any number of view functions as well as an `init()` function
 
-- An **init function** takes any parameters and returns an object of `{streams, updates, state, children}`
+- An **init function** takes any parameters and returns a state object of plain JS values and flyd streams.
 
-An object of `{streams, updates, state, children}` is called a **context**. Contexts always have this standard form:
+- A view function for a dynamic UI component takes a **state object** as its first parameter (plus any other parameters afterwards) and returns a snabbdom VTree
 
-- streams: an object of key/vals where the keys are stream names and the values are flyd streams
-- updates: an object of key/vals where the keys are stream names (corresponding to the names from 'streams'), and the values are **state updater functions**
-- state: a plain js object of any data
-- children: an object of key/vals where the keys are child component names and the values are child **context** objects
+Within your view functions, You can use your `state` to access the most recent state data to either read values or to bind eventlisteners to flyd streams.
 
-- A view function for a dynamic UI component takes a **context** as its first parameter (plus any other parameters) and returns a snabbdom VTree
-
-Within your view functions, You can use your `context.state` to access the most recent state data, and you can use `context.streams` to use snabbdom eventlisteners to push events or other data to your streams. "`ctx`" is a standard way of shortening the variable name.
-
-The **.updates** object inside a **context** is a set of updater functions. The keys in this object map to the keys in your **.streams** object. For example:
-
-```js
-let streams = {
-  s1: flyd.stream()
-}
-let updates = {
-  s1: (val, state) => R.assoc('key', val, state)
-}
-```
-
-This specifies a single stream, `s1`, that is initially empty, but may have any number of values pushed later. A corresponding updater, also called `s1`, defines how the state gets updated based on values from the `s1` stream. For every value on the stream called `s1`, we take the value and the current state, and associate the value to a key called `'key'` within the state. **The return value of an updater function is the newly updated state and is always a brand new state object**.
-
-You can use [flimflam-render](https://github.com/jayrbolton/flimflam-render) to render your very top-level component to the page. Using flimflam-render is only necessary in your actual app. In a "one-page" app, render is only called a single time.
+Use [flimflam-render](https://github.com/jayrbolton/flimflam-render) (also part of [ff-core](https://github.com/flimflamjs/ff-core) in ff-core/render) to render your component to the page. Using flimflam-render is only necessary in your actual app. In a "one-page" app, render is only called a single time.
 

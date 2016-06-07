@@ -7,29 +7,23 @@ import createTask from './create-task.es6'
 // A stateless component that just has a stream of new tasks and a new task form
 
 function init() {
-  let streams = {submit: flyd.stream()}
-  streams.newTask = getNewTask(streams.submit)
-  return {streams}
+  let submit = flyd.stream()
+  let newTask = flyd.map(getNewTask, submit)
+  return {submit, newTask}
 }
 
 
 // From a stream of form submit events, make a stream of new task objects
-function getNewTask(submit$) {
-  return flyd.map(
-    ev => {
-      ev.preventDefault()
-      let task = createTask({name: ev.currentTarget.querySelector('input').value})
-      ev.currentTarget.reset()
-      return task
-    }
-  , submit$)
+function getNewTask(ev) {
+  ev.preventDefault()
+  let task = createTask({name: ev.currentTarget.querySelector('input').value})
+  ev.currentTarget.reset()
+  return task
 }
 
 
-function view(component) {
-  return h('form', {
-    on: {submit: component.streams.submit}
-  }, [
+function view(state) {
+  return h('form', {on: {submit: state.submit}}, [
     h('input', {props: {type: 'text', name: 'name', placeholder: 'New Task'}})
   ])
 }

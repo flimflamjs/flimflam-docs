@@ -8,22 +8,28 @@
 
 import h from 'snabbdom/h'
 import flyd from 'flyd'
-import render from '../../../flimflam-render'
+import render from '../../../flimflam-render/index.es6'
 
 import taskList from './lib/task-list.es6'
 import newTaskForm from './lib/new-task-form.es6'
 
+import snabbdom from 'snabbdom'
+const patch = snabbdom.init([
+  require('snabbdom/modules/class')
+, require('snabbdom/modules/props')
+, require('snabbdom/modules/style')
+, require('snabbdom/modules/eventlisteners')
+])
 
-function init() {
-  return {
-    children: { taskList: taskList.init() }
-  }
-}
+const init = () => ({taskList: taskList.init()})
 
+const view = state => h('div', [taskList.view(state.taskList)])
 
-function view(component) {
-  return h('div', [ taskList.view(component.children.taskList) ])
-}
+let container = document.querySelector('#container')
 
-let {vtree$, state$} = render(init(), view, container, {debug: true})
+let state = init()
+
+let x = render({ container, patch, view, state })
+
+window.x = x
 

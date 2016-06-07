@@ -14,10 +14,10 @@
     "babelify": "6.4.0"
   },
   "dependencies": {
-    "flyd": "^0.2.1",
-    "flimflam-render": "0.0.3",
-    "immutable": "^3.7.6",
-    "snabbdom": "^0.3.0",
-    "uuid": "2.0.1"
+    "flimflam-render": "0.1.1",
+    "flyd": "0.2.2",
+    "ramda": "0.21.0",
+    "snabbdom": "0.5.0",
+    "uuid": "2.0.2"
   }
 }
