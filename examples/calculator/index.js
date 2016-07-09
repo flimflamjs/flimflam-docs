@@ -16,10 +16,10 @@ function init() {
 
   // Single stream of current expression
   let expr = scanMerge([
-    [input, (expr, i) => i] // changing input simply sets the expr
+    [input,   (expr, i) => i]           // changing input simply sets the expr
   , [digit,   (expr, ch) => expr + ch] // pressing a button simply appends that to the expr
-  , [op, applyOp]
-  , [clear,    (expr, _) => '']
+  , [op,      applyOp]
+  , [clear,   (expr, _) => '']
   ], '')
 
   return {input, digit, op, clear, expr}
@@ -28,11 +28,12 @@ function init() {
 const applyOp = (expr, op) => {
   const digits = R.map(Number, expr.split(/[ _]/))
   if(digits.length > 1) {
-    return ops[op](digits)
+    return String(ops[op](digits))
   } else {
     return expr
   }
 }
+
 
 let ops = {
   '+' : R.sum
@@ -45,7 +46,7 @@ let ops = {
 
 // Our counter view (all the markup with event handler streams)
 function view(state) {
-  return h('div', [
+  return h('body', [
     h('h1', 'postfix calculator!')
   , h('p', 'Enter numbers first and operators last; separate numbers by spaces')
   , h('input', {
@@ -68,9 +69,8 @@ function view(state) {
 const btn = stream => n => h('button', {on: {click: [stream, n]}}, String(n))
 
 // Plain HTML container node
-let container = document.querySelector('#container')
 const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props')])
 let state = init()
 
-render({view, patch, container, state})
+render({view, patch, container: document.body, state})
 

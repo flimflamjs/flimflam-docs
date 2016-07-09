@@ -25,7 +25,7 @@ function init() {
   , [form.newTask, (tasks, t) => R.prepend(t, tasks)]
   ], defaultTasks)
 
-  return { checkBox, changeInput, clickNav, tasks, form }
+  return {checkBox, changeInput, clickNav, tasks, form}
 }
 
 // if showFinished is true, then mark all finished tasks as hidden false and unfinished as hidden true
@@ -56,11 +56,10 @@ function editName(tasks, triple) {
 // TODO thunk calls on this
 function view(state) {
   let tasks = R.filter(t => !t.hidden, state.tasks())
-  return h('div.taskList', [
+  return h('body.taskList', [
     nav(state)
   , state.showingCompleted ? '' : newTaskForm.view(state.form)
   , h('ul.list', R.addIndex(R.map)(taskRow(state), state.tasks()))
-
   ])
 }
 

@@ -4,8 +4,6 @@ import h from 'snabbdom/h'
 import createTask from './create-task.es6'
 
 
-// A stateless component that just has a stream of new tasks and a new task form
-
 function init() {
   let submit = flyd.stream()
   let newTask = flyd.map(getNewTask, submit)

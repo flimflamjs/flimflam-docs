@@ -8,7 +8,7 @@
 
 import h from 'snabbdom/h'
 import flyd from 'flyd'
-import render from '../../../flimflam-render/index.es6'
+import render from 'ff-core/render'
 
 import taskList from './lib/task-list.es6'
 import newTaskForm from './lib/new-task-form.es6'
@@ -25,11 +25,7 @@ const init = () => ({taskList: taskList.init()})
 
 const view = state => h('div', [taskList.view(state.taskList)])
 
-let container = document.querySelector('#container')
+const state = init()
 
-let state = init()
-
-let x = render({ container, patch, view, state })
-
-window.x = x
+const streams = render({ container: document.body, patch, view, state })
 
