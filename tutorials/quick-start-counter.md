@@ -133,7 +133,7 @@ The final step to get things working is to now make use of our newly created `ad
 
 ```js
 // Our counter view (all the markup with event handler streams)
-function view(ctx) {
+function view(state) {
   return h('div', [
     h('p', `The total count is ${state.sum()}`)
   , h('button', {on: {click: [state.add,  1]}}, 'Increment!')
