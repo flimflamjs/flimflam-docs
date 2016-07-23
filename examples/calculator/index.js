@@ -6,8 +6,7 @@ import snabbdom from 'snabbdom'
 
 import render from 'flimflam-render'
 
-// This calculator component tracks:
-//   expr: an array of numbers and operators pushed in the expression
+// Initialize calculator component state
 function init() {
   let input = flyd.stream() // input keyups
   let digit = flyd.stream() // button presses
@@ -34,15 +33,13 @@ const applyOp = (expr, op) => {
   }
 }
 
-
+// Dictionary of operator symbols mapped to functions that can be applied to an array of numbers
 let ops = {
   '+' : R.sum
 , '*' : R.reduce(R.multiply, 1)
 , '/' : ns => R.reduce(R.divide, R.head(ns), R.tail(ns))
 , '-' : ns => R.reduce(R.subtract, R.head(ns), R.tail(ns))
 }
-
-
 
 // Our counter view (all the markup with event handler streams)
 function view(state) {
@@ -68,9 +65,7 @@ function view(state) {
 
 const btn = stream => n => h('button', {on: {click: [stream, n]}}, String(n))
 
-// Plain HTML container node
-const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props')])
-let state = init()
 
-render({view, patch, container: document.body, state})
+const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props')])
+render({view, patch, container: document.body, state: init()})
 
