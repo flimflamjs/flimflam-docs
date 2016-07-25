@@ -38,5 +38,5 @@ A dynamic component must export any number of view functions as well as an `init
 
 Within your view functions, You can use your `state` to access the most recent state data to either read values or to bind eventlisteners to flyd streams.
 
-Use [flimflam-render](https://github.com/jayrbolton/flimflam-render) (also part of [ff-core](https://github.com/flimflamjs/ff-core) in ff-core/render) to render your component to the page. Using flimflam-render is only necessary in your actual app. In a "one-page" app, render is only called a single time.
+Use [flimflam-render](https://github.com/jayrbolton/flimflam-render) (also part of [ff-core](https://github.com/flimflamjs/ff-core) in ff-core/render) to render your component to the page. Using flimflam-render is only necessary in your actual app, and not used in modules that are only UI components. In a "one-page" app, render is only called a single time.
 
