@@ -8,20 +8,20 @@ import render from 'flimflam-render'
 
 // Initialize calculator component state
 function init() {
-  let input = flyd.stream() // input keyups
-  let digit = flyd.stream() // button presses
-  let op = flyd.stream() // button presses
-  let clear = flyd.stream() // clear out expression
+  let input$ = flyd.stream() // input keyups
+  let digit$ = flyd.stream() // button presses
+  let op$ = flyd.stream() // button presses
+  let clear$ = flyd.stream() // clear out expression
 
   // Single stream of current expression
-  let expr = scanMerge([
-    [input,   (expr, i) => i]           // changing input simply sets the expr
-  , [digit,   (expr, ch) => expr + ch] // pressing a button simply appends that to the expr
-  , [op,      applyOp]
-  , [clear,   (expr, _) => '']
+  let expr$ = scanMerge([
+    [input$,   (expr, i) => i]           // changing input simply sets the expr
+  , [digit$,   (expr, ch) => expr + ch] // pressing a button simply appends that to the expr
+  , [op$,      applyOp]
+  , [clear$,   (expr, _) => '']
   ], '')
 
-  return {input, digit, op, clear, expr}
+  return {input$, digit$, op$, clear$, expr$}
 }
 
 const applyOp = (expr, op) => {
@@ -47,25 +47,27 @@ function view(state) {
     h('h1', 'postfix calculator!')
   , h('p', 'Enter numbers first and operators last; separate numbers by spaces')
   , h('input', {
-      on: {keyup: ev => state.input(ev.currentTarget.value)}
+      on: {keyup: ev => state.input$(ev.currentTarget.value)}
     , props: {
         name: 'expr'
       , placeholder: 'Calculate party'
-      , value: state.expr()
+      , value: state.expr$()
       }
     })
   , h('div', [
-      h('button', {on: {click: state.clear}}, 'clear')
-    , h('button', {on: {click: [state.digit, '_']}, props: {innerHTML: '_'}})
+      h('button', {on: {click: state.clear$}}, 'clear')
+    , h('button', {on: {click: [state.digit$, '_']}, props: {innerHTML: '_'}})
     ])
-  , h('div', R.map(btn(state.digit), [1,2,3,4,5,6,7,8,9,0]))
-  , h('div', R.map(btn(state.op), ['+','-','*','/']))
+  , h('div', R.map(btn(state.digit$), [1,2,3,4,5,6,7,8,9,0]))
+  , h('div', R.map(btn(state.op$), R.keys(ops)))
   ])
 }
 
-const btn = stream => n => h('button', {on: {click: [stream, n]}}, String(n))
-
+// A single digit or operator button
+const btn = stream => n => 
+  h('button', {on: {click: [stream, n]}}, String(n))
 
 const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props')])
-render({view, patch, container: document.body, state: init()})
+let container = document.body, state = init()
+render({view, patch, container, state})
 
