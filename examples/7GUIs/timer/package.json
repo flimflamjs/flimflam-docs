@@ -9,10 +9,6 @@
   },
   "author": "jay r bolton <jayrbolton@gmail.com> (http://jayrbolton.com/)",
   "license": "ISC",
-  "dependencies": {
-    "flyd-timer": "0.0.1",
-    "flyd-zip": "0.0.1"
-  },
   "devDependencies": {
     "babel-preset-es2015": "6.14.0",
     "babelify": "7.3.0",
