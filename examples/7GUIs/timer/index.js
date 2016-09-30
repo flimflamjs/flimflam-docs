@@ -51,7 +51,7 @@ function view(state) {
         }
       })
     ])
-  , h('p', (state.secondsElapsed$()||0).toFixed(1) + 's')
+  , h('p.secondsElapsed', (state.secondsElapsed$()||0).toFixed(1) + 's')
   , h('form', {
       on: {submit: ev => {ev.preventDefault(); state.submit$(ev.currentTarget)}}
     }, [
