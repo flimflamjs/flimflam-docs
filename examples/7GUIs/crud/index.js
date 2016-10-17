@@ -17,7 +17,7 @@ const log$ = flyd.map(console.log.bind(console))
 function init() {
   let state = {
     filter$: flyd.stream('')
-  , selectedIdx$: flyd.stream({})
+  , selectedIdx$: flyd.stream()
   , clickCreate$: flyd.stream()
   , clickUpdate$: flyd.stream()
   , clickDelete$: flyd.stream()
@@ -76,7 +76,7 @@ function view(state) {
 function searchFilter(state) {
   return h('div', [
     h('label', 'Filter by surname: ')
-  , h('input', {
+  , h('input.filter', {
       props: {type: 'text', name: 'filter'}
     , on: {keyup: ev => state.filter$(ev.currentTarget.value)}
     })
@@ -88,28 +88,28 @@ function fields(state) {
   return h('div', [
     h('div', [
       h('label', 'Name: ')
-    , h('input', {props: {name: 'name', type: 'text', value: R.last(selected.split(', '))}})
+    , h('input.name', {props: {name: 'name', type: 'text', value: R.last(selected.split(', '))}})
     ])
   , h('div', [
       h('label', 'Surname: ')
-    , h('input', {props: {name: 'surname', type: 'text', value: R.head(selected.split(', '))}})
+    , h('input.surname', {props: {name: 'surname', type: 'text', value: R.head(selected.split(', '))}})
     ])
   ])
 }
 
 function actions(state) {
   return h('div', [
-    h('button', {
+    h('button.create', {
       on: {click: state.clickCreate$}
     , props: {type: 'button'}
     }, "Create")
-    , h('button', {
+    , h('button.update', {
       on: {click: state.clickUpdate$}
-    , props: {disabled: !state.selectedIdx$(), type: 'button'}
+    , props: {disabled: state.selectedIdx$() === undefined, type: 'button'}
     }, "Update")
-    , h('button', {
+    , h('button.delete', {
       on: {click: state.clickDelete$}
-    , props: {disabled: !state.selectedIdx$(), type: 'button'}
+    , props: {disabled: state.selectedIdx$() === undefined, type: 'button'}
     }, "Delete")
   ])
 }
@@ -118,7 +118,7 @@ function actions(state) {
 const nameOption = state => (name, idx) => {
   const isMatched = state.selectedIdx$() === idx
   return h('li' , {
-    on: {click: [state.selectedIdx$, isMatched ? null : idx]}
+    on: {click: [state.selectedIdx$, isMatched ? undefined : idx]}
   , class: {selected: isMatched}
   }, name)
 }

@@ -10,6 +10,13 @@ import flyd_flatMap from 'flyd/module/flatmap'
 import flyd_sampleOn from 'flyd/module/sampleon'
 import flyd_scanMerge from 'flyd/module/scanmerge'
 
+window.afterSilence = require('flyd/module/aftersilence')
+window.every = require('flyd/module/every')
+window.flyd = flyd
+window.inlast = require('flyd/module/inlast')
+window.keepWhen = require('flyd/module/keepwhen')
+window.lift = require("flyd/module/lift")
+
 function init() {
   let state = {change$: flyd.stream(), submit$: flyd.stream()}
   // Stream of maximum duration values in second (from range input)
