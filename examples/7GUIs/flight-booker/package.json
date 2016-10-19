@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "budo index.js -l -- -t babelify",
+    "dev": "budo index.js -l --css index.css -- -t babelify",
     "test": "zuul --local --ui mocha-qunit -- test/index.js"
   },
   "author": "jay r bolton <jayrbolton@gmail.com> (http://jayrbolton.com/)",

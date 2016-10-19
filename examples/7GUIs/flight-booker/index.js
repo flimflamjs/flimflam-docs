@@ -24,6 +24,7 @@ function init() {
   // Stream of return dates entered by the user
   const returnDate$ = flyd.map(toMoment, state.keyupReturn$)
   state.departureInvalid$ = flyd.map(dateIsInvalid, state.keyupDeparture$)
+  flyd.map(x => console.log('x', x), state.departureInvalid$)
   state.returnInvalid$ = flyd.map(dateIsInvalid, state.keyupReturn$)
 
   state.notBeforeReturn$ = flyd_lift(
@@ -58,39 +59,41 @@ function view(state) {
       , h('option', {props: {value: 'round-trip'}}, 'return flight')
       ])
     , h('br')
-    , h('input', {
+    , h('input.departureDate', {
         props: {
           name: 'departureDate'
         , type: 'text'
         , placeholder: 'Departure date (DD.MM.YYYY)'
         }
-      , style: {background: state.departureInvalid$() ? 'red' : ''}
+      , class: {red: state.departureInvalid$()}
       , on: {keyup: state.keyupDeparture$}
       })
     , h('br')
-    , h('input', {
+    , h('input.returnDate', {
         props: {
           name: 'returnDate'
         , type: 'text'
         , placeholder: state.type$() === 'one-way' ? 'No return date' : 'Return date (DD.MM.YYYY)'
         , disabled: state.type$() === 'one-way'
         }
-      , style: {background: state.returnInvalid$() ? 'red' : ''}
+      , class: {red: state.returnInvalid$()}
       , on: {keyup: state.keyupReturn$}
       })
     , h('br')
     , h('button', {props: {disabled: state.returnInvalid$() || state.departureInvalid$() || state.notBeforeReturn$()}}, 'Book')
     ])
-  , h('p', state.successMessage$() || 'No flight booked yet.')
+  , h('p.bookingMessage', state.successMessage$() || 'No flight booked yet.')
   ])
 }
 
 
-const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props'), require('snabbdom/modules/style')])
+const patch = snabbdom.init([require('snabbdom/modules/eventlisteners'), require('snabbdom/modules/props'), require('snabbdom/modules/class')])
 
 render({
   container: document.body
 , state: init()
 , patch, view
 })
+
+module.exports = {init, view}
 

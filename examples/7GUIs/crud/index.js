@@ -17,7 +17,7 @@ const log$ = flyd.map(console.log.bind(console))
 function init() {
   let state = {
     filter$: flyd.stream('')
-  , selectedIdx$: flyd.stream()
+  , selectedName$: flyd.stream()
   , clickCreate$: flyd.stream()
   , clickUpdate$: flyd.stream()
   , clickDelete$: flyd.stream()
@@ -30,19 +30,19 @@ function init() {
   , flyd.map(getFormData) // form -> object
   )
   const toCreate$ = dataToSave(state.clickCreate$)
-  // Sample from the currently selected index on every delete click
-  const toDelete$ = flyd_sampleOn(state.clickDelete$, state.selectedIdx$)
-  // Get a pair of currently selected index and new name to update on every update click
+  // Sample from the currently selected name on every delete click
+  const toDelete$ = flyd_sampleOn(state.clickDelete$, state.selectedName$)
+  // Get a pair of currently selected name and new name to update on every update click
   const toUpdate$ = flyd_lift(
     R.pair
-  , flyd_sampleOn(state.clickUpdate$, state.selectedIdx$)
+  , flyd_sampleOn(state.clickUpdate$, state.selectedName$)
   , dataToSave(state.clickUpdate$)
   )
   const defaultNames = ['Emil, Hans', 'Mustermann, Max', 'Tisch, Roman']
   const names$ = flyd_scanMerge([
     [toCreate$, (names, n) => R.append(n, names)]
-  , [toUpdate$, (names, [idx, n]) => R.update(idx, n, names)]
-  , [toDelete$, (names, idx) => R.remove(idx, 1, names)]
+  , [toUpdate$, (names, [oldName, newName]) => R.findAndUpdate(n => n === oldName, newName, names)]
+  , [toDelete$, (names, idx) => R.findAndREmove(idx, 1, names)]
   ], defaultNames)
 
   state.filteredNames$ = flyd_lift(filter, names$, state.filter$)
@@ -50,7 +50,7 @@ function init() {
   return state
 }
 
-// Get the form from the button click, then convert the form into an object
+// Get the form from the button click, then convert the form into an object, using the form-serialize module
 const getFormData = ev =>
   serialize(ev.currentTarget.form, {hash: true})
 
@@ -84,7 +84,7 @@ function searchFilter(state) {
 }
 
 function fields(state) {
-  const selected = state.filteredNames$()[state.selectedIdx$()] || ''
+  const selected = R.find(R.equals(state.selectedName$()), state.filteredNames$())
   return h('div', [
     h('div', [
       h('label', 'Name: ')
@@ -105,20 +105,20 @@ function actions(state) {
     }, "Create")
     , h('button.update', {
       on: {click: state.clickUpdate$}
-    , props: {disabled: state.selectedIdx$() === undefined, type: 'button'}
+    , props: {disabled: state.selectedName$() === undefined, type: 'button'}
     }, "Update")
     , h('button.delete', {
       on: {click: state.clickDelete$}
-    , props: {disabled: state.selectedIdx$() === undefined, type: 'button'}
+    , props: {disabled: state.selectedName$() === undefined, type: 'button'}
     }, "Delete")
   ])
 }
 
 // A single item within the listing of selectable names
 const nameOption = state => (name, idx) => {
-  const isMatched = state.selectedIdx$() === idx
+  const isMatched = state.selectedName$() === name
   return h('li' , {
-    on: {click: [state.selectedIdx$, isMatched ? undefined : idx]}
+    on: {click: [state.selectedName$, isMatched ? undefined : name]}
   , class: {selected: isMatched}
   }, name)
 }

@@ -12,15 +12,6 @@ Challenges: working with bidirectional dataflow, working with user-provided text
 
 ## Running the code
 
-First, npm install. Then serve the component with:
-
-```sh
-npm run dev
-```
-
-Run the tests:
-
-```sh
-npm run test
-```
+- Start the dev server with `npm run dev`
+- Run the tests with `npm run test`
 

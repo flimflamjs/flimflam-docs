@@ -10,19 +10,16 @@
 
 [More info](https://github.com/eugenkiss/7guis/wiki#crud)
 
+## Notes
+
+This component uses `scanMerge` as a convenient updater of the `names$` stream, which has a stream of arrays. Create, update, and delete all get scanned and merged into a single stream of arrays of names.
+
+This component has an example of using `R.compose` to apply multiple stream functions to a single stream. The `dataToSave` function converts a submitted form into a valid string that we can persist to memory.
+
+We use an index for the identifier for each name when selecting and updating (because we were lazy). Using a unique ID on each name instead of an index is equally possible and would prevent some 
+
 ## Running the code
 
-Serve the component:
-
-```sh
-budo -l index.js -- -t [ babelify --presets babel-preset-es2015 ]
-# or `npm run dev`
-```
-
-Run the tests:
-
-```sh
-zuul --local --ui mocha-qunit -- test/index.js
-# or `npm run test`
-```
+- Start the dev server with `npm run dev`
+- Run the tests with `npm run test`
 

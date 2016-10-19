@@ -1,13 +1,10 @@
-
 # 7GUIs in flimflam
 
-"7GUIs" is a programming usability benchmark for GUI libraries. 
+"7GUIs" is a programming usability benchmark for GUI libraries.
 
 Flimflam is a pattern for creating GUIs using functional programming.
 
-Each directory here constitues a single 7GUIs example. Each example has a set of tests in its /test/ directory.
-
-These are still in progress. Still to do are flight booker, circle drawer, and cells.
+Each directory here constitutes a single 7GUIs example. Each example has a set of tests that can be found each each directory's `test/index.js` file. Each test directory also has its own README.md file with further details.
 
 - [Counter](/examples/7GUIs/counter)
 - [Converter](/examples/7GUIs/converter)
@@ -17,4 +14,3 @@ These are still in progress. Still to do are flight booker, circle drawer, and c
 - [Circle Drawer](/examples/7GUIs/circle-drawer)
 - [Cells](/examples/7GUIs/cells)
 
-There is a README.md and test/index.js file within each example/directory with more details.
