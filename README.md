@@ -1,4 +1,3 @@
-
 # Getting Started
 
 - [Quickstart tutorial -- counter example](/tutorials/quick-start-counter.md)
@@ -6,7 +5,6 @@
 - [flimflam module publishing guidelines](/guidelines.md)
 
 # Examples
-- counter
-- todo
-- postfix calculator
-- combination puzzle
+- [7GUIs examples (a benchmark of UI programming)](/examples/7GUIs)
+- [postfix calculator](/examples/calculator)
+- [todo list](/examples/todo)
