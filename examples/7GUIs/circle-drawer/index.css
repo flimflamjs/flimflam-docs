@@ -1,0 +1,19 @@
+svg {
+  background: #ddd;
+}
+svg circle {
+  fill: #61ad61;
+}
+svg circle:hover {
+  fill: #888;
+}
+svg circle.is-selected {
+  fill: green;
+  stroke: black;
+}
+circle:hover {
+  background: grey;
+}
+.is-hidden {
+  display: none;
+}

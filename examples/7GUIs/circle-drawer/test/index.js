@@ -13,7 +13,9 @@ function initComponent() {
   return streams
 }
 
-suite('cells')
+suite('circle-drawer')
+
+// undo/redo
 
 test('', ()=> {
 })

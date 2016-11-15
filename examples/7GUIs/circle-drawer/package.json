@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "budo index.js -l -- -t babelify",
+    "dev": "budo index.js -l --css index.css -- -t babelify",
     "test": "zuul --local --ui mocha-qunit -- test/index.js"
   },
   "author": "jay r bolton <jayrbolton@gmail.com> (http://jayrbolton.com/)",
@@ -12,6 +12,7 @@
   "dependencies": {
     "ff-core": "0.0.4",
     "flyd": "0.2.2",
+    "flyd-undo": "0.0.1",
     "ramda": "0.22.1",
     "snabbdom": "0.5.3"
   },
