@@ -59,7 +59,7 @@ function init() {
   return state
 }
 
-// Find a circle with a given idea from a list of circle objects
+// Find a circle with a given ID from a list of circle objects
 const findCirc = (id, circles) =>  {
   return R.find(R.propEq('id', Number(id)), circles)
 }
